@@ -23,14 +23,17 @@ namespace Aula4.Controllers
 
         private List<Person> Iniciar()
         {
-            var lista = Person.Lista;
-            if (Ler().Count == 0) Gravar(lista);
-            return lista;
-            
+            return new List<Person>
+            {
+                new Person { Nome = "Lisa", Idade = 17 },
+                new Person { Nome = "LiKaDuo", Idade = 17 },
+                new Person { Nome = "Juan", Idade = 16 }
+            };
+
         }
         private List<Person> Ler()
-
         {
+
             var lista = Person.Lista;
             string people = HttpContext.Session.GetString("people");
             
@@ -41,6 +44,10 @@ namespace Aula4.Controllers
             else
             {
                 lista = JsonConvert.DeserializeObject<List<Person>>(people);
+                if (lista.Count() == 0)
+                {
+                    lista = Iniciar();
+                }
             }
                 return lista;
         }
@@ -61,22 +68,26 @@ namespace Aula4.Controllers
         // GET: PersonController/Details/5
         public ActionResult Details(int id)
         {
-            return View(Person.Lista[id]);
+            var lista = Ler();
+            return View(lista[id]);
         }
 
         // GET: PersonController/Create
         public ActionResult Create()
         {
-            return View();
+            return View(new Person());
         }
 
         // POST: PersonController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Person person)
         {
             try
             {
+                var lista = Ler();
+                lista.Add(person);
+                Gravar(lista);
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -88,16 +99,20 @@ namespace Aula4.Controllers
         // GET: PersonController/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            var lista = Ler();
+            return View(lista[id]);
         }
 
         // POST: PersonController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, Person person)
         {
             try
             {
+                var lista = Ler();
+                lista[id] = person;
+                Gravar(lista);
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -109,16 +124,20 @@ namespace Aula4.Controllers
         // GET: PersonController/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            var lista = Ler();
+            return View(lista[id]);
         }
 
         // POST: PersonController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id, Person person)
         {
             try
             {
+                var lista = Ler();
+                lista.RemoveAt(id);
+                Gravar(lista);
                 return RedirectToAction(nameof(Index));
             }
             catch
